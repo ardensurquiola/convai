@@ -1,6 +1,6 @@
 # ConvAI - AI Voice Calling Platform
 
-A modern AI-powered voice calling platform for sales and customer success, built with Vue.js, Tailwind CSS, Firebase, and Twilio.
+A modern AI-powered voice calling platform for banking transaction verification. I calls customers to validate identity in case of a banking alert.
 
 ## 🚀 Features
 

@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased bg-gray-900 text-white;
   }
 }
 
@@ -24,6 +24,55 @@
   .gradient-bg {
     @apply bg-gradient-to-br from-primary-50 via-white to-blue-50;
   }
+}
+
+/* Vue Tel Input Customization */
+.vue-tel-input .vti__dropdown {
+  background: #1f2937 !important;
+  border: 1px solid #4b5563 !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+  z-index: 9999 !important;
+}
+
+.vue-tel-input .vti__dropdown-list {
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+.vue-tel-input .vti__dropdown-item {
+  color: #f3f4f6 !important;
+  padding: 0.5rem 0.75rem !important;
+  border-bottom: 1px solid #374151 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+}
+
+.vue-tel-input .vti__dropdown-item:hover {
+  background-color: #374151 !important;
+}
+
+.vue-tel-input .vti__dropdown-item.vti__dropdown-item--highlighted {
+  background-color: #4b5563 !important;
+}
+
+/* Hide country names and dial codes, show only flags */
+.vue-tel-input .vti__dropdown-item .vti__dropdown-item-text,
+.vue-tel-input .vti__dropdown-item .vti__dropdown-item-dial-code {
+  display: none !important;
+}
+
+.vue-tel-input .vti__dropdown-item .vti__flag {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Make dropdown items centered with just flags */
+.vue-tel-input .vti__dropdown-item {
+  text-align: center !important;
+  justify-content: center !important;
 }
 
 /* Animations */
