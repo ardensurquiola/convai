@@ -10,6 +10,9 @@ const accountSid = functions.config().twilio?.account_sid || process.env.TWILIO_
 const authToken = functions.config().twilio?.auth_token || process.env.TWILIO_AUTH_TOKEN
 const twilioPhoneNumber = functions.config().twilio?.phone_number || process.env.TWILIO_PHONE_NUMBER
 
+// Your Heroku WebSocket URL
+const WEBSOCKET_URL = 'wss://convai-websocket-15efd4906704.herokuapp.com/websocket'
+
 // Initialize Twilio client only if credentials are available
 let client = null
 if (accountSid && authToken) {
@@ -38,31 +41,22 @@ exports.makeOutboundCall = functions.https.onCall(async (data, context) => {
   }
 
   try {
-    // Make the call using Twilio
+    // Make the call using Twilio with ConversationRelay
     const call = await client.calls.create({
       to: phoneNumber,
       from: twilioPhoneNumber,
-      // TwiML URL that will handle the call
-      // You can host this on Firebase Hosting or use Twilio's TwiML bins
-      url: 'https://your-firebase-app.web.app/twiml/demo-greeting',
-      // Alternative: Use inline TwiML
       twiml: `
         <Response>
-          <Say voice="alice" language="en-US">
-            Hello! Thanks for trying ConvAI, your A I powered voice assistant. 
-            This is a demo call to show you how our technology works. 
-            With ConvAI, you can handle customer calls automatically, 24/7. 
-            Our A I can answer questions, schedule appointments, qualify leads, and much more. 
-            Imagine never missing an important customer call again! 
-            If you'd like to learn more, visit our website to get started. 
-            Thank you for your time, and have a great day!
-          </Say>
-          <Pause length="1"/>
-          <Say voice="alice" language="en-US">
-            Goodbye!
-          </Say>
+          <Connect>
+            <ConversationRelay 
+              url="${WEBSOCKET_URL}"
+              welcomeGreeting="Buenos días. Soy el asistente de seguridad de su banco."
+            />
+          </Connect>
         </Response>
-      `
+      `,
+      record: true, // Enable recording for Conversational Intelligence
+      recordingStatusCallback: 'https://us-central1-holaai-790b0.cloudfunctions.net/handleRecordingCallback'
     })
 
     // Log the call in Firestore
@@ -70,13 +64,14 @@ exports.makeOutboundCall = functions.https.onCall(async (data, context) => {
       phoneNumber,
       callSid: call.sid,
       status: call.status,
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      websocketUrl: WEBSOCKET_URL
     })
 
     return {
       success: true,
       callSid: call.sid,
-      message: 'Call initiated successfully'
+      message: 'AI call initiated successfully'
     }
   } catch (error) {
     console.error('Error making call:', error)
@@ -120,26 +115,26 @@ exports.handleIncomingCall = functions.https.onRequest((req, res) => {
 })
 
 /**
- * Handle speech input from user
+ * Handle recording callbacks for Conversational Intelligence
  */
-exports.handleSpeech = functions.https.onRequest(async (req, res) => {
-  const twiml = new twilio.twiml.VoiceResponse()
-  const speechResult = req.body.SpeechResult
-
-  console.log('User said:', speechResult)
-
-  // Here you would integrate with your AI/NLP service
-  // For demo purposes, we'll just echo back
-  twiml.say(
-    {
-      voice: 'alice',
-      language: 'en-US'
-    },
-    `I heard you say: ${speechResult}. This is where our A I would process your request and provide a helpful response. Thank you for trying ConvAI!`
-  )
-
-  res.type('text/xml')
-  res.send(twiml.toString())
+exports.handleRecordingCallback = functions.https.onRequest((req, res) => {
+  const { CallSid, RecordingUrl, RecordingStatus } = req.body
+  
+  console.log('Recording callback:', {
+    CallSid,
+    RecordingUrl,
+    RecordingStatus
+  })
+  
+  // Store recording info in Firestore
+  admin.firestore().collection('recordings').add({
+    callSid: CallSid,
+    recordingUrl: RecordingUrl,
+    status: RecordingStatus,
+    timestamp: admin.firestore.FieldValue.serverTimestamp()
+  })
+  
+  res.status(200).send('OK')
 })
 
 

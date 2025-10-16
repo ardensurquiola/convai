@@ -11,8 +11,8 @@
     <!-- Demo Call Section -->
     <div class="space-y-6">
       <div class="text-center">
-        <h3 class="text-lg font-semibold text-white mb-2">Try our AI voice assistant</h3>
-        <p class="text-gray-400 text-sm">Enter your number and experience AI magic in seconds</p>
+        <h3 class="text-lg font-semibold text-white mb-2">Try our AI banking assistant</h3>
+        <p class="text-gray-400 text-sm">Enter your number to test AI-powered banking verification</p>
       </div>
 
       <form @submit.prevent="handleCallRequest" class="space-y-4">
@@ -43,7 +43,7 @@
       <!-- Success Message -->
       <div v-if="callSuccess" class="bg-green-900/50 border border-green-600 rounded-lg p-4 flex items-center space-x-3">
         <CheckCircle class="h-6 w-6 text-green-400" />
-        <p class="text-green-300 font-medium">Great! You'll receive a call shortly. Get ready for your aha moment! 🎉</p>
+        <p class="text-green-300 font-medium">Great! You'll receive an AI banking verification call shortly. Get ready for your aha moment! 🎉</p>
       </div>
 
       <!-- Error Message -->
